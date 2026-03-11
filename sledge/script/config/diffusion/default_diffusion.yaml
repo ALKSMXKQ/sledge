@@ -29,6 +29,7 @@ num_classes: 4
 
 guidance_scale: 4.0
 num_inference_timesteps: 100
+generation_prompt: null
 
 autoencoder_checkpoint: ???
 diffusion_checkpoint: null

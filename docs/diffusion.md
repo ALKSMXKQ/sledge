@@ -19,5 +19,18 @@ bash scenario_caching_diffusion.sh
 The samples are stored in `$SLEDGE_EXP_ROOT/caches/scenario_cache` by default. These samples can be simulated in the v0.1 release.
 Additional options for route extrapolation by inpainting will be added in a future update.
 
+You can also control generated scenario domains with natural language by overriding `generation_prompt`:
+
+```bash
+python $SLEDGE_DEVKIT_ROOT/sledge/script/run_diffusion.py \
+  py_func=scenario_caching \
+  +diffusion=training_dit_model \
+  autoencoder_checkpoint=/path/to/rvae_checkpoint.ckpt \
+  diffusion_checkpoint=/path/to/diffusion/checkpoint \
+  generation_prompt="mostly boston with some pittsburgh traffic"
+```
+
+The prompt parser supports city names / abbreviations (e.g. `boston`, `bos`, `pgh`, `vegas`, `sgp`) and simple weighting phrases such as `8 boston 2 pgh`, `only singapore`, or `mostly vegas`.
+
 ### 3. Evaluating Diffusion
 Coming soon!

@@ -7,6 +7,7 @@ from nuplan.planning.training.preprocessing.utils.feature_cache import FeatureCa
 
 from sledge.autoencoder.preprocessing.features.sledge_vector_feature import SledgeVector
 from sledge.autoencoder.preprocessing.features.map_id_feature import MAP_ID_TO_NAME
+from sledge.diffusion.prompting import resolve_class_labels_from_prompt
 from sledge.script.builders.diffusion_builder import build_pipeline_from_checkpoint
 
 logger = get_logger(__name__, log_level="INFO")
@@ -26,7 +27,15 @@ def run_scenario_caching(cfg: DictConfig) -> None:
     logger.info("Scenario caching...")
     storing_mechanism = FeatureCachePickle()
     current_cache_size: int = 0
-    class_labels = list(range(cfg.num_classes)) * (cfg.inference_batch_size // cfg.num_classes)
+    default_class_labels = (list(range(cfg.num_classes)) * cfg.inference_batch_size)[: cfg.inference_batch_size]
+    class_labels = resolve_class_labels_from_prompt(
+        prompt=cfg.generation_prompt,
+        num_classes=cfg.num_classes,
+        inference_batch_size=cfg.inference_batch_size,
+        default_class_labels=default_class_labels,
+    )
+    logger.info(f"Scenario generation prompt: {cfg.generation_prompt}")
+    logger.info(f"Class labels for generation: {class_labels}")
     num_total_batches = (cfg.cache.scenario_cache_size // cfg.inference_batch_size) + 1
     for _ in tqdm(range(num_total_batches), desc="Load cache files..."):
         sledge_vector_list = pipeline(
